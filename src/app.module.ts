@@ -12,7 +12,7 @@ import { CoursesModule } from './courses/courses.module';
       host:'db',
       port:5432,
       username:'postgres',
-      password:'postgres',
+      password:'docker',
       database:'cursonestjs',
       autoLoadEntities: true,
       synchronize: false
