@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { NotFoundError } from '../../common/erros/types/NotFoundError';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -50,6 +51,12 @@ export class UsersRepository {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) throw new NotFoundError('User not found.');
+
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto,
