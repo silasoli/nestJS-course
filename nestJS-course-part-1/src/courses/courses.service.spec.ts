@@ -5,6 +5,7 @@ import { Connection } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 import { Tag } from './entities/tag.entity';
 
@@ -60,28 +61,125 @@ describe('CoursesService', () => {
     expect(expectOutputCourse).toStrictEqual(newCourse);
   });
 
-  //   describe('findOne', () => {
-  //     describe('Buscar curso pelo ID', () => {
-  //       it('Deve retornar o objeto Course', async () => {
-  //         const courseId = '1';
-  //         const expectedCourse = {};
+  it('should list courses', async () => {
+    const expectOutputTags = [
+      {
+        id,
+        name: 'nestjs',
+        created_at: date,
+      },
+    ];
+    const expectOutputCourse = [
+      {
+        id,
+        name: 'Test',
+        description: 'Test description',
+        created_at: date,
+        tags: expectOutputTags,
+      },
+    ]
+    const mockCourseRepository = {
+      findAll: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+      find: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+    };
+    //@ts-expect-error defined part of methods
+    service['courseRepository'] = mockCourseRepository;
+    const courses = await service.findAll();
+    expect(mockCourseRepository.find).toHaveBeenCalled();
+    expect(expectOutputCourse).toStrictEqual(courses);
+  });
 
-  //         courseRepository.findOne.mockReturnValue(expectedCourse);
-  //         const course = await service.findOne(courseId);
-  //         expect(course).toEqual(expectedCourse);
-  //       });
 
-  //       it('Deve retornar um NotFoundException', async () => {
-  //         const courseId = '1';
-  //         courseRepository.findOne.mockReturnValue(undefined);
+  it('should gets a course', async () => {
+    const expectOutputTags = [
+      {
+        id,
+        name: 'nestjs',
+        created_at: date,
+      },
+    ];
+    const expectOutputCourse = [
+      {
+        id,
+        name: 'Test',
+        description: 'Test description',
+        created_at: date,
+        tags: expectOutputTags,
+      },
+    ]
+    const mockCourseRepository = {
+      findOne: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+    };
+    //@ts-expect-error defined part of methods
+    service['courseRepository'] = mockCourseRepository;
+    const course = await service.findOne(id);
+    expect(mockCourseRepository.findOne).toHaveBeenCalled();
+    expect(expectOutputCourse).toStrictEqual(course);
+  });
 
-  //         try {
-  //           await service.findOne(courseId);
-  //         } catch (error) {
-  //           expect(error).toBeInstanceOf(NotFoundException);
-  //           expect(error.message).toEqual(`Course ID ${courseId} not found`);
-  //         }
-  //       });
-  //     });
-  //   });
+  it('should updates a course', async () => {
+    const expectOutputTags = [
+      {
+        id,
+        name: 'nestjs',
+        created_at: date,
+      },
+    ];
+    const expectOutputCourse = {
+      id,
+      name: 'Test',
+      description: 'Test description',
+      created_at: date,
+      tags: expectOutputTags,
+    };
+    const mockCourseRepository = {
+      update: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+      save: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+      preload: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+    };
+    const mockTagRepository = {
+      create: jest.fn().mockReturnValue(Promise.resolve(expectOutputTags)),
+      findOne: jest.fn(),
+    };
+    //@ts-expect-error defined part of methods
+    service['courseRepository'] = mockCourseRepository;
+    //@ts-expect-error defined part of methods
+    service['tagRepository'] = mockTagRepository;
+    const updateCourseDto: UpdateCourseDto = {
+      name: 'Test',
+      description: 'Test description',
+      tags: ['nestjs'],
+    };
+    const course = await service.update(id, updateCourseDto);
+    expect(mockCourseRepository.save).toHaveBeenCalled();
+    expect(expectOutputCourse).toStrictEqual(course);
+  });
+
+  it('should deletes a course', async () => {
+    const expectOutputTags = [
+      {
+        id,
+        name: 'nestjs',
+        created_at: date,
+      },
+    ];
+    const expectOutputCourse = [
+      {
+        id,
+        name: 'Test',
+        description: 'Test description',
+        created_at: date,
+        tags: expectOutputTags,
+      },
+    ];
+    const mockCourseRepository = {
+      findOne: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+      remove: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourse)),
+    };
+    //@ts-expect-error defined part of methods
+    service['courseRepository'] = mockCourseRepository;
+    const course = await service.remove(id);
+    expect(mockCourseRepository.remove).toHaveBeenCalled();
+    expect(expectOutputCourse).toStrictEqual(course);
+  });
 });
